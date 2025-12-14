@@ -29,5 +29,7 @@ The queries in this folder cover various operational areas including:
 
 > **Note**: These queries are strictly for data gathering. They are optimized for performance and do not modify any existing records. Ensure your Odoo schema matches the query expectations.
 
+> **link to the Module's Repo :**  https://github.com/OCA/reporting-engine/tree/18.0/bi_sql_editor
+
 
 ## By HSxTech - Collaborate, Lead, Innovate
