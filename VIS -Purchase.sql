@@ -12,6 +12,7 @@ WITH po_lines AS (
         pol.product_qty AS qty_ordered,
         pol.price_unit,
         pol.price_subtotal AS amount_total,
+        po.amount_total AS order_amount_total,
         po.currency_id,
         po.state
     FROM purchase_order_line pol
@@ -40,24 +41,20 @@ SELECT
     
     -- Vendor Info
     pl.vendor_id AS x_vendor_id,
-    pl.vendor_name AS x_vendor_name,
     
     -- Product Info
     pl.product_id AS x_product_id,
-    pl.product_name AS x_product_name,
     pl.category_name AS x_category_name,
     
     -- Metrics
     pl.qty_ordered AS x_qty_ordered,
     pl.price_unit AS x_price_unit,
     pl.amount_total AS x_amount_total,
+    pl.order_amount_total AS x_order_amount_total,
     
     -- Stock Info
     COALESCE(ma.qty_received, 0) AS x_qty_received,
-    ma.last_receipt_date AS x_last_receipt_date,
-    
-    -- Comparisons
-    pl.product_name || ' - ' || pl.vendor_name AS x_product_vendor_key,
+    ma.last_receipt_date AS x_last_receipt_date, 
 
     -- Calculated Status
     CASE 
@@ -68,4 +65,4 @@ SELECT
 
 FROM po_lines pl
 LEFT JOIN moves_agg ma ON pl.line_id = ma.purchase_line_id
-ORDER BY pl.date_order DESC;
+ORDER BY pl.date_order DESC
