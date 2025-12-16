@@ -34,35 +34,45 @@ moves_agg AS (
     GROUP BY sm.purchase_line_id
 )
 SELECT
-    pl.line_id AS x_line_id,
+    MIN(pl.line_id) AS x_line_id,
     pl.order_id AS x_order_id,
     pl.order_reference AS x_order_reference,
-    pl.date_order AS x_date_order,
+    MAX(pl.date_order) AS x_date_order,
     
     -- Vendor Info
     pl.vendor_id AS x_vendor_id,
+    MAX(pl.vendor_name) AS x_vendor_name,
     
     -- Product Info
     pl.product_id AS x_product_id,
-    pl.category_name AS x_category_name,
+    MAX(pl.product_name) AS x_product_name,
+    MAX(pl.category_name) AS x_category_name,
     
     -- Metrics
-    pl.qty_ordered AS x_qty_ordered,
-    pl.price_unit AS x_price_unit,
-    pl.amount_total AS x_amount_total,
-    pl.order_amount_total AS x_order_amount_total,
+    SUM(pl.qty_ordered) AS x_qty_ordered,
+    CASE 
+        WHEN SUM(COALESCE(ma.qty_received, 0)) > 0 THEN SUM(pl.amount_total) / SUM(ma.qty_received)
+        ELSE 0 
+    END AS x_price_unit,
+    SUM(pl.amount_total) AS x_amount_total,
+    MAX(pl.order_amount_total) AS x_order_amount_total,
     
     -- Stock Info
-    COALESCE(ma.qty_received, 0) AS x_qty_received,
-    ma.last_receipt_date AS x_last_receipt_date, 
+    SUM(COALESCE(ma.qty_received, 0)) AS x_qty_received,
+    MAX(ma.last_receipt_date) AS x_last_receipt_date, 
 
     -- Calculated Status
     CASE 
-        WHEN COALESCE(ma.qty_received, 0) >= pl.qty_ordered THEN 'Fully Received'
-        WHEN COALESCE(ma.qty_received, 0) > 0 THEN 'Partially Received'
+        WHEN SUM(COALESCE(ma.qty_received, 0)) >= SUM(pl.qty_ordered) THEN 'Fully Received'
+        WHEN SUM(COALESCE(ma.qty_received, 0)) > 0 THEN 'Partially Received'
         ELSE 'Pending'
     END AS x_delivery_status
 
 FROM po_lines pl
 LEFT JOIN moves_agg ma ON pl.line_id = ma.purchase_line_id
-ORDER BY pl.date_order DESC
+GROUP BY 
+    pl.order_id,
+    pl.order_reference,
+    pl.vendor_id,
+    pl.product_id
+ORDER BY x_date_order DESC
