@@ -43,5 +43,22 @@ These queries are intended for use within the SQL Views configuration in Odoo.
 
 > **Link to the Module's Repo:**  https://github.com/OCA/reporting-engine/tree/18.0/bi_sql_editor
 
+## Smart Data Import Utility
+
+To facilitate rapid testing, this repository includes `import_dump.sh`, a high-performance shell script designed to automate the ingestion of massive Odoo database dumps into your local Docker environment.
+
+### Key Features
+*   **Dynamic Database Naming**: Automatically converts messy filenames (e.g., `TCC Dump Final.sql`) into clean, PostgreSQL-compliant database names (`tcc_dump_final`).
+*   **Auto-Provisioning**: Detects if the target database exists and creates it automatically if missing.
+*   **Streamlined Workflow**: Handles the `docker cp` and `psql` execution in a single command, significantly reducing manual overhead during large imports (tested with ~8GB dumps).
+
+### Usage
+Run the script from your terminal providing the path to your `.sql` dump:
+```bash
+./import_dump.sh path/to/your_dump.sql
+```
+
+> [!IMPORTANT]
+> Ensure your `postgres_db` container is running before executing the script. The script assumes the default container name and user (`odoo`) defined in the project's environment configuration.
 
 ## By HSxTech - Collaborate, Lead, Innovate
