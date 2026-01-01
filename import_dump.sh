@@ -16,9 +16,9 @@ if [ ! -f "$DUMP_PATH" ]; then
 fi
 
 # Derive database name from filename
-# 1. Get basename: e.g., "TCC Dump.sql"
-# 2. Remove extension: "TCC Dump"
-# 3. Sanitize: "tcc_dump" (lowercase, replace non-alphanumeric with underscores)
+# 1. Get basename: e.g., "odoo Dump.sql"
+# 2. Remove extension: "Odoo Dump"
+# 3. Sanitize: "odoo_dump" (lowercase, replace non-alphanumeric with underscores)
 DB_NAME=$(basename "$DUMP_PATH")
 DB_NAME="${DB_NAME%.*}"
 DB_NAME=$(echo "$DB_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/_/g' | sed 's/__*/_/g' | sed 's/^_//;s/_$//')
